@@ -19,11 +19,12 @@ const int IR_RECEIVE_PIN = 7;   // Pin for receiving IR signals
 const int IR_SEND_PIN = 3;      // Pin for the IR LED (connected to the transmitter)
 
 // LED and Control Pins
+int lv_counter = 0;
 const int redPin = 10;          // Pin connected to the red LED
 const int lowBatteryPin = 4;    // Define pin 4 for low battery indication
 const int greenPin = 5;         // Pin connected to the green LED
 const int orangePin = 6;        // Pin connected to the orange LED
-const int controlPin = 8;       // Pin to check if functionalities should occur
+const int controlPin = A1;       // Pin to check if functionalities should occur
 const int pin9 = 9;             // Pin to be set HIGH for 2 seconds when the command is received
 const int pin11 = 11;           // Pin to be set HIGH for 2 seconds when the standard key is received
 const int batteryPin = A0;      // Pin connected to the battery for voltage measurement
@@ -180,7 +181,9 @@ void setup() {
 }
 
 void loop() {
-    bool pin8State = digitalRead(controlPin);
+    float pin8State = analogRead(controlPin);
+    //Serial.print("pin state: ");
+    Serial.println(pin8State);
     static unsigned long lastMeasurementTime = 0;
     unsigned long currentMillis = millis();
     
@@ -223,7 +226,9 @@ void loop() {
 
     lastBatteryCheckTime = millis();  // Update the last battery check time
 }*/
-    if (pin8State == LOW) {
+    if (pin8State < 1000) {
+    lv_counter = lv_counter +1;
+    if (lv_counter >5) {
         // Turn ON the red LED and turn off the other LEDs
         digitalWrite(greenPin, LOW);
         digitalWrite(orangePin, LOW);
@@ -329,7 +334,10 @@ void loop() {
             IrReceiver.resume(); // Prepare for the next IR signal
         }
     }
-
+    }
+    else{
+      lv_counter = 0;
+    }
     if (greenLedBlinking) {
         digitalWrite(greenPin, HIGH);
         delay(200);
